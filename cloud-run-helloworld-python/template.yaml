@@ -30,7 +30,6 @@ spec:
         wifServiceAccount: 
           title: what is the service account that can be used to federate to the WIF pool?
           type: string
-          pattern: ^[a-z][a-z0-9\-]{5,29}$@^[a-z][a-z0-9-]{4,28}[a-z0-9]$\.iam\.gserviceaccount\.com$
     - title: Setup your Artifact registry repository
       properties:
         arRepo: 
