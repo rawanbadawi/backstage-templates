@@ -1,0 +1,36 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  annotations: 
+    run.googleapis.com/launch-stage: GA
+    run.googleapis.com/ingress: ${{ values.ingress }}
+  name: ${SERVICE_NAME}
+  labels: 
+      region: ${REGION}
+spec:
+  template:
+    metadata:      
+      name: ${SERVICE_NAME}-${REVISION_TAG} 
+      annotations:
+        run.googleapis.com/execution-environment: gen2
+        autoscaling.knative.dev/minScale: 1
+        autoscaling.knative.dev/maxScale: 10
+
+    spec:
+      containerConcurrency: 80
+      containers:
+      - image: ${CONTAINER_IMAGE}
+        name: ${SERVICE_NAME}
+        ports: 
+        - name: http1
+          containerPort: 8080
+        env:
+        - name: PROJECT_ID
+          value: ${PROJECT_ID}
+        - name: NAME 
+          value: ${{ values.serviceName }}
+
+  traffic: 
+  - latestRevision: true
+    percent: 100
+    

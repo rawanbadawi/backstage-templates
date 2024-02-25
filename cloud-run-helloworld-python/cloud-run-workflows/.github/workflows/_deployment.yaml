@@ -1,0 +1,142 @@
+on:
+  workflow_call:
+
+jobs:
+  lint: 
+    #TODO: add linter for csharp / dotnet 
+    name: Lint
+    if: github.event_name == 'pull_request'
+    runs-on: 'ubuntu-latest'
+    timeout-minutes: 360
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: PyLint 
+      if: ${{ vars.language }} == 'python'
+      working-directory: ./
+      run: |
+        pip install -r requirements.txt
+        pip install pylint
+        pylint --recursive=y .
+
+  scan:
+    name: Scan
+    if: github.event_name == 'pull_request'
+    runs-on: 'ubuntu-latest'
+    needs: lint
+    timeout-minutes: 360
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ '${{ vars.language }}' ] 
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    # Initializes the CodeQL tools for scanning.
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
+        source-root: ./
+
+    # Autobuild attempts to build any compiled languages (C/C++, C#, Go, Java, or Swift).
+    # If this step fails, then you should remove it and run the build manually (see below)
+    # - name: Autobuild
+    #   uses: github/codeql-action/autobuild@v2
+
+    # - name: Perform CodeQL Analysis
+    #   uses: github/codeql-action/analyze@v2
+    #   with:
+    #     category: "/language:${{matrix.language}}"
+
+  image-build-push: 
+    if: github.event_name == 'push'
+    name: "Image Build & Push"
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Google Authentication
+        id: auth
+        uses: 'google-github-actions/auth@v0'
+        with:
+          token_format: 'access_token'
+          workload_identity_provider: '${{ secrets.WIF_PROVIDER }}' # e.g. - projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider
+          service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'     # e.g. - my-service-account@my-project.iam.gserviceaccount.com
+
+      # Authenticate Docker to Google Cloud Artifact Registry
+      - name: Docker Authentication
+        id: docker-auth
+        uses: 'docker/login-action@v3'
+        with:
+          username: 'oauth2accesstoken'
+          password: '${{ steps.auth.outputs.access_token }}'
+          registry: '${{ vars.ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev'
+
+      - name: Build and Tag
+        id: build-image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./
+          push: true 
+          tags: |
+            ${{ vars.ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.ARTIFACT_REGISTRY_REPO }}/${{ vars.service_name }}:${{ github.sha }}
+            ${{ vars.ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.ARTIFACT_REGISTRY_REPO }}/${{ vars.service_name }}:latest
+      
+      - name: Docker Push
+        shell: bash
+        run: |-
+          docker push "${{ vars.ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.ARTIFACT_REGISTRY_REPO }}/${{ vars.service_name }}:${{ github.sha }}"
+          docker push "${{ vars.ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.ARTIFACT_REGISTRY_REPO }}/${{ vars.service_name }}:latest"
+
+  deploy: 
+    if: github.event_name == 'push' 
+    name: "Cloud Run Deployment"
+    runs-on: ubuntu-latest
+    needs: [image-build-push]
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Google Authentication
+        id: auth
+        uses: 'google-github-actions/auth@v0'
+        with:
+          token_format: 'access_token'
+          workload_identity_provider: '${{ secrets.WIF_PROVIDER }}' # e.g. - projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider
+          service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'     # e.g. - my-service-account@my-project.iam.gserviceaccount.com
+
+      - name: Create Service Declaration   
+        run: |-
+          export CONTAINER_IMAGE="${{ vars.ARTIFACT_REGISTRY_LOCATION  }}-docker.pkg.dev/${{ vars.artifact_registry_project }}/${{ vars.artifact_registry_repo }}/${{ vars.service_name }}:${{ github.sha }}"
+          export SERVICE_NAME="${{ vars.service_name }}"
+          export PROJECT_ID="${{ vars.gcp_project_id }}"
+          export REVISION_TAG="${{ github.sha }}"
+          export REGION="${{ vars.region }}"
+      
+          envsubst < ./service-yaml/container.yaml > container.yaml
+
+      - name: Deploy to Cloud Run
+        id: deploy-cloud-run
+        uses: google-github-actions/deploy-cloudrun@v0
+        with:
+          project_id: ${{ vars.gcp_project_id }}
+          service: ${{ vars.service_name }}
+          region: ${{ vars.region }}
+          metadata: container.yaml 

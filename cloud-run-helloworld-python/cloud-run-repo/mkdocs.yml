@@ -1,0 +1,8 @@
+site_name: ${{ values.serviceName }}
+
+nav:
+  - Home: main.md
+  - Cloud Run Deployment: README.md
+
+plugins:
+  - techdocs-core

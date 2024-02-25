@@ -1,0 +1,17 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.serviceName }}
+  description: ${{ values.description }} Deployed to Cloud Run 
+  tags:
+    - cloudrun
+    - gcp
+    - python
+    - service
+  annotations:
+    github.com/project-slug: ${{ values.slug }}
+    backstage.io/techdocs-ref: dir:.
+spec:
+  owner: ${{ values.owner }}
+  type: service
+  lifecycle: experimental

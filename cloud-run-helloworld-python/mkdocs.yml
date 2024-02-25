@@ -1,0 +1,8 @@
+site_name: cloud-run-helloworld-python
+
+nav:
+  - Home: main.md
+  - Cloud Run Deployment: README.md
+
+plugins:
+  - techdocs-core

@@ -1,0 +1,8 @@
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: template
+  description: A collection of Public Cloud Platform Team templates
+spec:
+  targets:
+    - ./backstage-templates/ccloud-run-helloworld-python/cloud-run-helloworld-python.yaml

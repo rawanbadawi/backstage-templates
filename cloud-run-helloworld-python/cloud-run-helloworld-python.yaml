@@ -1,0 +1,344 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-template
+kind: Template
+metadata:
+  name: cloud-run-ci-cd-deploy-gitub
+  title: Cloud Run Deploy a Service
+  description: This template deploys a Service into Cloud Run. 
+  tags:
+      - gcp
+      - cloud-run
+  annotations:
+    backstage.io/techdocs-ref: dir:.
+spec:
+  owner: user:guest
+  type: service
+
+  parameters:
+    - title: Specify workload Identity federation parameters
+      properties:
+        wifProjectNumber:
+          title: What is the Workload identity project number?
+          type: string
+          ui:hint: Get the project number by running gcloud projects list --filter="PROJECT_ID=[your-project-id]" --format="value(PROJECT_NUMBER)"
+        wifPoolName:
+          title: What is your workload identity pool name?
+          type: string
+        wifProviderName:
+         title: what is your Workload Identity provider name?
+         type: string
+        wifServiceAccount: 
+          title: what is the service account that can be used to federate to the WIF pool?
+          type: string
+          pattern: ^[a-z][a-z0-9\-]{5,29}$@^[a-z][a-z0-9-]{4,28}[a-z0-9]$\.iam\.gserviceaccount\.com$
+    - title: Setup your Artifact registry repository
+      properties:
+        arRepo: 
+          title: Enter the Artifact registry repository name
+          type: string
+        arLocation: 
+          title: Enter the Artifact registry location
+          type: string
+          default: us
+          enum:
+          - us
+          - europe
+          - asia
+          - us-west1
+          - us-west2
+          - us-west3
+          - us-west4
+          - us-central1
+          - us-east1
+          - us-east4
+          - us-east5
+          - us-south1
+          - northamerica-northeast1
+          - northamerica-northeast2
+          - southamerica-west1
+          - southamerica-east1
+          - europe-west2
+          - europe-west1
+          - europe-west4
+          - europe-west6
+          - europe-west3
+          - europe-north1
+          - europe-central2
+          - europe-west8
+          - europe-southwest1
+          - europe-west9
+          - europe-west12
+          - europe-west10
+          - asia-south1
+          - asia-southeast1
+          - asia-southeast2
+          - asia-east2
+          - asia-east1
+          - asia-northeast1
+          - asia-northeast2
+          - australia-southeast1
+          - australia-southeast2
+          - asia-northeast3
+          - me-west1
+          - me-central1
+          - me-central2
+          - africa-south1
+          enumNames:
+          - 'US Multi-region (us)'
+          - 'Europe Multi-region (europe)'
+          - 'Asia Multi-region (asia)'
+          - 'Oregon (us-west1)'
+          - 'Los Angeles (us-west2)'
+          - 'Salt Lake City (us-west3)'
+          - 'Las Vegas (us-west4)'
+          - 'Iowa (us-central1)'
+          - 'South Carolina (us-east1)'
+          - 'N. Virginia (us-east4)'
+          - 'Columbus (us-east5)'
+          - 'Dallas (us-south1)'
+          - 'Montréal (northamerica-northeast1)'
+          - 'Toronto (northamerica-northeast2)'
+          - 'Santiago (southamerica-west1)'
+          - 'São Paulo (southamerica-east1)'
+          - 'London (europe-west2)'
+          - 'Belgium (europe-west1)'
+          - 'Netherlands (europe-west4)'
+          - 'Zurich (europe-west6)'
+          - 'Frankfurt (europe-west3)'
+          - 'Finland (europe-north1)'
+          - 'Warsaw (europe-central2)'
+          - 'Milan (europe-west8)'
+          - 'Madrid (europe-southwest1)'
+          - 'Paris (europe-west9)'
+          - 'Turin (europe-west12)'
+          - 'Berlin (europe-west10)'
+          - 'Mumbai (asia-south1)'
+          - 'Singapore (asia-southeast1)'
+          - 'Jakarta (asia-southeast2)'
+          - 'Hong Kong (asia-east2)'
+          - 'Taiwan (asia-east1)'
+          - 'Tokyo (asia-northeast1)'
+          - 'Osaka (asia-northeast2)'
+          - 'Sydney (australia-southeast1)'
+          - 'Melbourne (australia-southeast2)'
+          - 'Seoul (asia-northeast3)'
+          - 'Tel Aviv (me-west1)'
+          - 'Doha (me-central1)'
+          - 'Dammam 7 (me-central2)'
+          - 'Johannesburg (africa-south1)'
+    
+    - title: Setup your Cloud Run service
+      properties:
+        gcpProjectId:
+          title: GCP Project ID
+          type: string
+          description: Enter the GCP project ID that you wish to deploy cloud run to
+          pattern: ^[a-z][a-z0-9-]{4,28}[a-z0-9]$
+        serviceName:
+          title: Service Name
+          type: string
+          description: Unique name of the new service
+          maxLength: 25
+          pattern: ^([a-z][a-z0-9]*)(-[a-z0-9]+)*$
+        serviceDescription:
+          title: Describe your service
+          type: string
+          ui:placeholder: My hello world application
+        region: 
+          title: Select the GCP region where you wish to host this Cloud Run service.
+          type: string
+          default: us-central1
+          enum:
+            - us-west1
+            - us-west2
+            - us-west3
+            - us-west4
+            - us-central1
+            - us-east1
+            - us-east4
+            - us-east5
+            - us-south1
+            - northamerica-northeast1
+            - northamerica-northeast2
+            - southamerica-west1
+            - southamerica-east1
+            - europe-west2
+            - europe-west1
+            - europe-west4
+            - europe-west6
+            - europe-west3
+            - europe-north1
+            - europe-central2
+            - europe-west8
+            - europe-southwest1
+            - europe-west9
+            - europe-west12
+            - europe-west10
+            - asia-south1
+            - asia-southeast1
+            - asia-southeast2
+            - asia-east2
+            - asia-east1
+            - asia-northeast1
+            - asia-northeast2
+            - australia-southeast1
+            - australia-southeast2
+            - asia-northeast3
+            - me-west1
+            - me-central1
+            - me-central2
+            - africa-south1
+          enumNames:
+            - 'Oregon (us-west1)'
+            - 'Los Angeles (us-west2)'
+            - 'Salt Lake City (us-west3)'
+            - 'Las Vegas (us-west4)'
+            - 'Iowa (us-central1)'
+            - 'South Carolina (us-east1)'
+            - 'N. Virginia (us-east4)'
+            - 'Columbus (us-east5)'
+            - 'Dallas (us-south1)'
+            - 'Montréal (northamerica-northeast1)'
+            - 'Toronto (northamerica-northeast2)'
+            - 'Santiago (southamerica-west1)'
+            - 'São Paulo (southamerica-east1)'
+            - 'London (europe-west2)'
+            - 'Belgium (europe-west1)'
+            - 'Netherlands (europe-west4)'
+            - 'Zurich (europe-west6)'
+            - 'Frankfurt (europe-west3)'
+            - 'Finland (europe-north1)'
+            - 'Warsaw (europe-central2)'
+            - 'Milan (europe-west8)'
+            - 'Madrid (europe-southwest1)'
+            - 'Paris (europe-west9)'
+            - 'Turin (europe-west12)'
+            - 'Berlin (europe-west10)'
+            - 'Mumbai (asia-south1)'
+            - 'Singapore (asia-southeast1)'
+            - 'Jakarta (asia-southeast2)'
+            - 'Hong Kong (asia-east2)'
+            - 'Taiwan (asia-east1)'
+            - 'Tokyo (asia-northeast1)'
+            - 'Osaka (asia-northeast2)'
+            - 'Sydney (australia-southeast1)'
+            - 'Melbourne (australia-southeast2)'
+            - 'Seoul (asia-northeast3)'
+            - 'Tel Aviv (me-west1)'
+            - 'Doha (me-central1)'
+            - 'Dammam 7 (me-central2)'
+            - 'Johannesburg (africa-south1)'
+    
+        ingress: 
+          type: string
+          title: select the ingress setting for Cloud Run.
+          default: all
+          enum:
+            - all
+            - internal-and-cloud-load-balancing
+            - internal
+          enumNames:
+            - All
+            - Internal and Cloud Load Balancing
+            - Internal
+          
+          
+    - title: Create the Repository to publish to
+      properties:
+        repoUrl:
+          title: Github Repository Location
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+        owner:
+          title: Owner
+          type: string
+          description: Owner of the component
+          ui:field: OwnerPicker
+          ui:options:
+            catalogFilter:
+              kind: User 
+
+
+############################################################################################################################################################################################################
+
+  steps:
+
+    - id: fetchPythonTemplates
+      name: Fetch python templates
+      action: fetch:template
+      input:
+        url: ./cloud-run-repo
+        targetPath: ./code
+        replace: true
+        values:
+          serviceName: ${{ parameters.serviceName }}
+          ingress: ${{ parameters.ingress }}
+          slug: ${{ parameters.repoUrl | parseRepoUrl | pick('owner') }}/${{ parameters.repoUrl | parseRepoUrl | pick('repo') }}
+          description: ${{ parameters.description }}
+
+    - id: fetchWorkflows
+      name: Install Github Workflows
+      action: fetch:plain
+      input:
+        url: ./cloud-run-workflows
+        targetPath: ./code
+
+
+
+    - id: publishGitHubRepo
+      name: Create GitHub repo
+      action: publish:github
+      input:
+        repoUrl: ${{ parameters.repoUrl }}
+        description: Hello World deployment for ${{ parameters.serviceName }}
+        sourcePath: ./code
+        access: ${{ user.entity.metadata.name }}
+        requiredApprovingReviewCount: 1
+        repoVisibility: internal
+        defaultBranch: main
+        requireBranchesToBeUpToDate: true
+        requireCodeOwnerReviews: true
+        deleteBranchOnMerge: true
+        gitAuthorName: ${{ user.entity.metadata.name }}
+        gitAuthorEmail: ${{ user.entity.spec.profile.email }}
+        allowRebaseMerge: false
+        allowMergeCommit: false
+        allowSquashMerge: true
+        allowAutoMerge: true
+        protectEnforceAdmins: false
+        dismissStaleReviews: true
+        repoVariables:
+          LANGUAGE: python
+          SERVICE_NAME: ${{ parameters.serviceName }}
+          REGION: ${{ paramters.region }}
+          ARTIFACT_REGISTRY_REPO: ${{ paramters.arRepo }}
+          ARTIFACT_REGISTRY_LOCATION: ${{ parameters.arLocation }}
+          GCP_PROJECT_ID: ${{ parameters.gcpProjectId }}
+        secrets:
+          WIF_PROVIDER: projects/${{ parameters.wifProjectNumber }}/locations/global/workloadIdentityPools/${{ parameters.wifPoolName}}/providers/${{ parameters.wifProviderName }}
+          WIF_SERVICE_ACCOUNT: ${{ parameters.wifServiceAccount }}
+
+    - id: register
+      name: Register Catalog
+      action: catalog:register
+      input:
+        catalogInfoUrl: https://${{ parameters.repoUrl | parseRepoUrl | pick('host') }}/${{ parameters.repoUrl | parseRepoUrl | pick('owner') }}/${{ parameters.repoUrl | parseRepoUrl | pick('repo') }}/blob/main/catalog-info.yaml
+        optional: true
+
+
+
+
+############################################################################################################################################################################################################
+
+  output:
+    links:
+      - title: ${{ parameters.serviceName }} base code, make a change and commit to a branch.
+        icon: github
+        url: ${{ steps.publishGitHubRepo.output.remoteUrl }}
+    text:
+      - title: Next Steps
+        content: |
+          - Create a [PR](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request) to main branch to delpoy to your Cloud Run service 
