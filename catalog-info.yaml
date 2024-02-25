@@ -5,4 +5,4 @@ metadata:
   description: A collection of Public Cloud Platform Team templates
 spec:
   targets:
-    - ./backstage-templates/ccloud-run-helloworld-python/cloud-run-helloworld-python.yaml
+    - ./cloud-run-helloworld-python/cloud-run-helloworld-python.yaml
