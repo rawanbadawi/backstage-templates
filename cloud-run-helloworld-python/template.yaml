@@ -250,14 +250,14 @@ spec:
           ui:field: RepoUrlPicker
           ui:options:
             # Here's the option you can pass to the RepoUrlPicker
-            requestUserCredentials:
-              secretsKey: USER_OAUTH_TOKEN
-              additionalScopes:
-                github:
-                  - workflow:write
-                  - repo
-            allowedHosts:
-              - github.com
+            # requestUserCredentials:
+            #   secretsKey: USER_OAUTH_TOKEN
+            #   additionalScopes:
+            #     github:
+            #       - workflow:write
+            #       - repo
+            # allowedHosts:
+            #   - github.com
         owner:
           title: Owner
           type: string
@@ -301,7 +301,7 @@ spec:
         repoUrl: ${{ parameters.repoUrl }}
         description: Hello World deployment for ${{ parameters.serviceName }}
         sourcePath: ./code
-        token: ${{ secrets.USER_OAUTH_TOKEN }}e
+        #token: ${{ secrets.USER_OAUTH_TOKEN }}e
         defaultBranch: main
         repoVariables:
           LANGUAGE: python
