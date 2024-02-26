@@ -11,13 +11,19 @@
  * All required APIs for Google Cloud services have been enabled.
  * [Artifact Registry](https://cloud.google.com/artifact-registry/docs/docker/store-docker-container-images) repository must be created. 
 ```
-gcloud projects create example-foo-bar-1 --name="Happy project" --labels=type=happy
+export PROJECT_ID=example-foo-bar-1
+
+```
+
+```
+gcloud projects create ${PROJECT_ID}--name="Happy project" --labels=type=happy
 
 ```
 
 enable services
 
 ```
+gcloud config set project ${PROJECT_ID}
 
  gcloud services enable artifactregistry.googleapis.com iam.googleapis.com run.googleapis.com sts.googleapis.com cloudresourcemanager.googleapis.com
 
@@ -43,23 +49,27 @@ gcloud iam workload-identity-pools providers create-oidc "my-provider" \
 create service account:
 
 ```
-gcloud iam service-accounts create cloudrun-deploy --display-name="Cloud run deploy SA"
+export SA_NAME="cloudrun-deploy"
+gcloud iam service-accounts create ${SA_NAME} --display-name="Cloud run deploy SA"
 ```
 
 get the workload identity pool Project number
 
 ```
-Get the project number by running gcloud projects list --filter="PROJECT_ID=${PROJECT_ID}" --format="value(PROJECT_NUMBER)"
+
+export PROJECT_NUMBER=`gcloud projects list --filter="PROJECT_ID=${PROJECT_ID}" --format="value(PROJECT_NUMBER)"`
 
 ```
 assign SA proper roles
 ```
-gcloud iam service-accounts add-iam-policy-binding "my-service-account@${PROJECT_ID}.iam.gserviceaccount.com" \
+export MY_ORG="rawanbadawi"
+export MY_REPO="cloud-run-deploy"
+gcloud iam service-accounts add-iam-policy-binding "${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com" \
   --project="${PROJECT_ID}" \
   --role="roles/iam.workloadIdentityUser" \
-  --member="principalSet://iam.googleapis.com/projects/1234567890/locations/global/workloadIdentityPools/my-pool/attribute.repository/my-org/my-repo"
+  --member="principalSet://iam.googleapis.com/projects/${PROJECT_NUMBER}/locations/global/workloadIdentityPools/my-pool/attribute.repository/${MY_ORG}/${MY_REPO}"
 ```
-
+    gcloud projects add-iam-policy-binding ${PROJECT_ID} --member="serviceAccount:${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com" --role=roles/artifactregistry.writer
 
 create repository
 ```
@@ -69,3 +79,4 @@ gcloud artifacts repositories create my-cloudrun-repo \
     --description="store cloud run images" 
     
 ```
+roles/

@@ -249,6 +249,12 @@ spec:
           type: string
           ui:field: RepoUrlPicker
           ui:options:
+            # Here's the option you can pass to the RepoUrlPicker
+            requestUserCredentials:
+              secretsKey: USER_OAUTH_TOKEN
+              additionalScopes:
+                github:
+                  - workflow:write
             allowedHosts:
               - github.com
         owner:
@@ -296,7 +302,7 @@ spec:
         sourcePath: ./code
         access: ${{ user.entity.metadata.name }}
         requiredApprovingReviewCount: 1
-        repoVisibility: internal
+        repoVisibility: private
         defaultBranch: main
         requireBranchesToBeUpToDate: true
         requireCodeOwnerReviews: true
@@ -316,16 +322,18 @@ spec:
           ARTIFACT_REGISTRY_REPO: ${{ paramters.arRepo }}
           ARTIFACT_REGISTRY_LOCATION: ${{ parameters.arLocation }}
           GCP_PROJECT_ID: ${{ parameters.gcpProjectId }}
+          WIF_PROVIDER: projects/${{ parameters.wifProjectNumber }}/locations/global/workloadIdentityPools/${{ parameters.wifPoolName}}/providers/${{ parameters.wifProviderName }}
+          WIF_SERVICE_ACCOUNT: ${{ parameters.wifServiceAccount }}
         secrets:
           WIF_PROVIDER: projects/${{ parameters.wifProjectNumber }}/locations/global/workloadIdentityPools/${{ parameters.wifPoolName}}/providers/${{ parameters.wifProviderName }}
           WIF_SERVICE_ACCOUNT: ${{ parameters.wifServiceAccount }}
-
     - id: register
-      name: Register Catalog
+      name: Register
       action: catalog:register
       input:
-        catalogInfoUrl: https://${{ parameters.repoUrl | parseRepoUrl | pick('host') }}/${{ parameters.repoUrl | parseRepoUrl | pick('owner') }}/${{ parameters.repoUrl | parseRepoUrl | pick('repo') }}/blob/main/catalog-info.yaml
-        optional: true
+        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+        catalogInfoPath: '/catalog-info.yaml'
+
 
 
 
