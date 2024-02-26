@@ -256,8 +256,8 @@ spec:
             #     github:
             #       - workflow:write
             #       - repo
-            # allowedHosts:
-            #   - github.com
+             allowedHosts:
+               - github.com
         owner:
           title: Owner
           type: string
