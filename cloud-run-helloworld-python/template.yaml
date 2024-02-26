@@ -300,7 +300,7 @@ spec:
         repoUrl: ${{ parameters.repoUrl }}
         description: Hello World deployment for ${{ parameters.serviceName }}
         sourcePath: ./code
-        token: ${{ secrets.USER_OAUTH_TOKEN }}e
+        #token: ${{ secrets.USER_OAUTH_TOKEN }}e
         defaultBranch: main
         deleteBranchOnMerge: true
         gitAuthorName: ${{ user.entity.metadata.name }}
