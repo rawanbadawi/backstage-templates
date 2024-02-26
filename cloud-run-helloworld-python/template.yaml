@@ -294,27 +294,27 @@ spec:
 
 
 
-    # - id: publishGitHubRepo
-    #   name: Create GitHub repo
-    #   action: publish:github
-    #   input:
-    #     repoUrl: ${{ parameters.repoUrl }}
-    #     description: Hello World deployment for ${{ parameters.serviceName }}
-    #     sourcePath: ./code
-    #     #token: ${{ secrets.USER_OAUTH_TOKEN }}e
-    #     defaultBranch: main
-    #     repoVariables:
-    #       LANGUAGE: python
-    #       SERVICE_NAME: ${{ parameters.serviceName }}
-    #       REGION: ${{ parameters.region }}
-    #       ARTIFACT_REGISTRY_REPO: ${{ parameters.arRepo }}
-    #       ARTIFACT_REGISTRY_LOCATION: ${{ parameters.arLocation }}
-    #       GCP_PROJECT_ID: ${{ parameters.gcpProjectId }}
-    #       WIF_PROVIDER: projects/${{ parameters.wifProjectNumber }}/locations/global/workloadIdentityPools/${{ parameters.wifPoolName}}/providers/${{ parameters.wifProviderName }}
-    #       WIF_SERVICE_ACCOUNT: ${{ parameters.wifServiceAccount }}
-    #     secrets:
-    #       WIF_PROVIDER: projects/${{ parameters.wifProjectNumber }}/locations/global/workloadIdentityPools/${{ parameters.wifPoolName}}/providers/${{ parameters.wifProviderName }}
-    #       WIF_SERVICE_ACCOUNT: ${{ parameters.wifServiceAccount }}
+    - id: publishGitHubRepo
+      name: Create GitHub repo
+      action: publish:github
+      input:
+        repoUrl: ${{ parameters.repoUrl }}
+        description: Hello World deployment for ${{ parameters.serviceName }}
+        sourcePath: ./code
+        #token: ${{ secrets.USER_OAUTH_TOKEN }}e
+        defaultBranch: main
+        repoVariables:
+          LANGUAGE: python
+          SERVICE_NAME: ${{ parameters.serviceName }}
+          REGION: ${{ parameters.region }}
+          ARTIFACT_REGISTRY_REPO: ${{ parameters.arRepo }}
+          ARTIFACT_REGISTRY_LOCATION: ${{ parameters.arLocation }}
+          GCP_PROJECT_ID: ${{ parameters.gcpProjectId }}
+          WIF_PROVIDER: projects/${{ parameters.wifProjectNumber }}/locations/global/workloadIdentityPools/${{ parameters.wifPoolName}}/providers/${{ parameters.wifProviderName }}
+          WIF_SERVICE_ACCOUNT: ${{ parameters.wifServiceAccount }}
+        secrets:
+          WIF_PROVIDER: projects/${{ parameters.wifProjectNumber }}/locations/global/workloadIdentityPools/${{ parameters.wifPoolName}}/providers/${{ parameters.wifProviderName }}
+          WIF_SERVICE_ACCOUNT: ${{ parameters.wifServiceAccount }}
 
     - id: register
       name: Register
