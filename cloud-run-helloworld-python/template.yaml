@@ -306,8 +306,8 @@ spec:
         repoVariables:
           LANGUAGE: python
           SERVICE_NAME: ${{ parameters.serviceName }}
-          REGION: ${{ paramters.region }}
-          ARTIFACT_REGISTRY_REPO: ${{ paramters.arRepo }}
+          REGION: ${{ parameters.region }}
+          ARTIFACT_REGISTRY_REPO: ${{ parameters.arRepo }}
           ARTIFACT_REGISTRY_LOCATION: ${{ parameters.arLocation }}
           GCP_PROJECT_ID: ${{ parameters.gcpProjectId }}
           WIF_PROVIDER: projects/${{ parameters.wifProjectNumber }}/locations/global/workloadIdentityPools/${{ parameters.wifPoolName}}/providers/${{ parameters.wifProviderName }}
@@ -319,8 +319,8 @@ spec:
       name: Register
       action: catalog:register
       input:
-        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
-        catalogInfoPath: '/catalog-info.yaml'
+        catalogInfoUrl: https://${{steps.publishGitHubRepo.output.remoteUrl | parseRepoUrl | pick('host') }}/${{steps.publishGitHubRepo.output.remoteUrl | parseRepoUrl | pick('owner') }}/${{steps.publishGitHubRepo.output.remoteUrl | parseRepoUrl | pick('repo') }}/blob/main/catalog-info.yaml
+        optional: true
 
 
 
