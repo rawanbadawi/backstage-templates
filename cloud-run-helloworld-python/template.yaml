@@ -255,6 +255,7 @@ spec:
               additionalScopes:
                 github:
                   - workflow:write
+                  - repo
             allowedHosts:
               - github.com
         owner:
