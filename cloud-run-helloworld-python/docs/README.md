@@ -32,19 +32,20 @@ gcloud config set project ${PROJECT_ID}
 create wif
 
 ```
+export MY_ORG=rawanbadawi
 gcloud iam workload-identity-pools create "my-pool" \
   --project="${PROJECT_ID}" \
   --location="global" \
   --display-name="Demo pool"
 
-gcloud iam workload-identity-pools providers create-oidc "my-provider" \
+gcloud iam workload-identity-pools providers create-oidc "my-provider1" \
   --project="${PROJECT_ID}" \
   --location="global" \
   --workload-identity-pool="my-pool" \
   --display-name="Demo provider" \
-  --attribute-mapping="google.subject=assertion.repository,attribute.actor=assertion.actor,attribute.aud=assertion.aud" \
-  --issuer-uri="https://token.actions.githubusercontent.com"
-
+  --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.aud=assertion.aud,attribute.repository=assertion.repository" \
+  --issuer-uri="https://token.actions.githubusercontent.com" \ 
+  --attribute-condition=attribute.repository.contains('${MY_ORG}')
 ```
 create service account:
 

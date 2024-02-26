@@ -316,17 +316,12 @@ spec:
     #       WIF_PROVIDER: projects/${{ parameters.wifProjectNumber }}/locations/global/workloadIdentityPools/${{ parameters.wifPoolName}}/providers/${{ parameters.wifProviderName }}
     #       WIF_SERVICE_ACCOUNT: ${{ parameters.wifServiceAccount }}
 
-    - id: debug
-      name: debug
-      action: debug:log
-      input: 
-        message: ${{parameters.repoUrl | parseRepoUrl | pick('host') }} ${{ parameters.repoUrl }}
-    # - id: register
-    #   name: Register
-    #   action: catalog:register
-    #   input:
-    #     catalogInfoUrl: https://${{steps.publishGitHubRepo.output.remoteUrl | parseRepoUrl | pick('host') }}/${{steps.publishGitHubRepo.output.remoteUrl | parseRepoUrl | pick('owner') }}/${{steps.publishGitHubRepo.output.remoteUrl | parseRepoUrl | pick('repo') }}/blob/main/catalog-info.yaml
-    #     optional: true
+    - id: register
+      name: Register
+      action: catalog:register
+      input:
+        catalogInfoUrl: https://${{ parameters.repoUrl | parseRepoUrl | pick('host') }}/${{ parameters.repoUrl | parseRepoUrl | pick('owner') }}/${{ parameters.repoUrl | parseRepoUrl | pick('repo') }}/blob/main/catalog-info.yaml
+        optional: true
 
 
 
