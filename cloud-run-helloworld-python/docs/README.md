@@ -42,7 +42,7 @@ gcloud iam workload-identity-pools providers create-oidc "my-provider" \
   --location="global" \
   --workload-identity-pool="my-pool" \
   --display-name="Demo provider" \
-  --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.aud=assertion.aud" \
+  --attribute-mapping="google.subject=assertion.repository,attribute.actor=assertion.actor,attribute.aud=assertion.aud" \
   --issuer-uri="https://token.actions.githubusercontent.com"
 
 ```
@@ -83,4 +83,3 @@ gcloud artifacts repositories create my-cloudrun-repo \
     --description="store cloud run images" 
     
 ```
-roles/
