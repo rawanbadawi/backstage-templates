@@ -13,8 +13,8 @@ spec:
       name: ${SERVICE_NAME}-${REVISION_TAG} 
       annotations:
         run.googleapis.com/execution-environment: gen2
-        autoscaling.knative.dev/minScale: 1
-        autoscaling.knative.dev/maxScale: 10
+        autoscaling.knative.dev/minScale: '1'
+        autoscaling.knative.dev/maxScale: '10'
 
     spec:
       containerConcurrency: 80

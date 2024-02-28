@@ -38,7 +38,7 @@ gcloud iam workload-identity-pools create "my-pool" \
   --location="global" \
   --display-name="Demo pool"
 
-gcloud iam workload-identity-pools providers create-oidc "my-provider1" \
+gcloud iam workload-identity-pools providers create-oidc "my-provider" \
   --project="${PROJECT_ID}" \
   --location="global" \
   --workload-identity-pool="my-pool" \

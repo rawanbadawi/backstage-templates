@@ -71,7 +71,7 @@ jobs:
 
       - name: Google Authentication
         id: auth
-        uses: 'google-github-actions/auth@v0'
+        uses: 'google-github-actions/auth@v2'
         with:
           token_format: 'access_token'
           workload_identity_provider: '${{ secrets.WIF_PROVIDER }}' # e.g. - projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider
@@ -124,7 +124,7 @@ jobs:
 
       - name: Create Service Declaration   
         run: |-
-          export CONTAINER_IMAGE="${{ vars.ARTIFACT_REGISTRY_LOCATION  }}-docker.pkg.dev/${{ vars.artifact_registry_project }}/${{ vars.artifact_registry_repo }}/${{ vars.service_name }}:${{ github.sha }}"
+          export CONTAINER_IMAGE="${{ vars.ARTIFACT_REGISTRY_LOCATION  }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.artifact_registry_repo }}/${{ vars.service_name }}:${{ github.sha }}"
           export SERVICE_NAME="${{ vars.service_name }}"
           export PROJECT_ID="${{ vars.gcp_project_id }}"
           export REVISION_TAG="${{ github.sha }}"
@@ -134,7 +134,7 @@ jobs:
 
       - name: Deploy to Cloud Run
         id: deploy-cloud-run
-        uses: google-github-actions/deploy-cloudrun@v0
+        uses: google-github-actions/deploy-cloudrun@v2
         with:
           project_id: ${{ vars.gcp_project_id }}
           service: ${{ vars.service_name }}
