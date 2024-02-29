@@ -38,7 +38,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
@@ -140,3 +140,13 @@ jobs:
           service: ${{ vars.service_name }}
           region: ${{ vars.region }}
           metadata: container.yaml 
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+        with:
+          version: '>= 363.0.0'
+
+      - name: Add run invoker to public audience # please comment out if requires auth
+        run: |
+          gcloud run services add-iam-policy-binding ${{ vars.service_name }} \
+          --member="allUsers" \
+          --role="roles/run.invoker"'

@@ -11,7 +11,6 @@ metadata:
   annotations:
     backstage.io/techdocs-ref: dir:.
 spec:
-  owner: user:guest
   type: service
 
   parameters:
