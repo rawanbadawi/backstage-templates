@@ -1,5 +1,4 @@
-"""Module providing a function printing hello world as a sample."""
-# Copyright 2020 Google, LLC.
+# Copyright 2024 Google, LLC.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,12 +23,12 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello_world():
-    """Test Deployment Test."""
+    """Example Hello World route."""
     name = os.environ.get("NAME", "World")
     return f"Hello {name}!"
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
 # [END run_helloworld_service]
 # [END cloudrun_helloworld_service]
