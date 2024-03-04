@@ -1,8 +1,17 @@
 apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  namespace: default
+  name: demo
+spec:
+  owner: guests
+---
+
+apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: ${{ values.serviceName }}
-  description: ${{ values.description }} Deployed to Cloud Run 
+  description: ${{ values.serviceName }} Deployed to Cloud Run 
   tags:
     - cloudrun
     - gcp
@@ -12,6 +21,10 @@ metadata:
     github.com/project-slug: ${{ values.slug }}
     backstage.io/techdocs-ref: dir:.
 spec:
-  owner: ${{ values.owner }}
+  owner: guests
   type: service
+  system: demo
   lifecycle: experimental
+
+
+

@@ -52,10 +52,10 @@ jobs:
     # - name: Autobuild
     #   uses: github/codeql-action/autobuild@v2
 
-    # - name: Perform CodeQL Analysis
-    #   uses: github/codeql-action/analyze@v2
-    #   with:
-    #     category: "/language:${{matrix.language}}"
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        category: "/language:${{matrix.language}}"
 
   image-build-push: 
     if: github.event_name == 'push'
@@ -150,5 +150,6 @@ jobs:
       - name: Add run invoker to public audience # please comment out if requires auth
         run: |
           gcloud run services add-iam-policy-binding ${{ vars.service_name }} \
+          --region=${{ vars.region }} --project=${{ vars.gcp_project_id }} \
           --member="allUsers" \
           --role="roles/run.invoker"
