@@ -1,3 +1,4 @@
-
-Flask==3.0.2
-gunicorn==21.2.0
+# recommended to pin versions on the binaries
+Flask==2.0.2
+gunicorn
+Werkzeug==2.2.2
