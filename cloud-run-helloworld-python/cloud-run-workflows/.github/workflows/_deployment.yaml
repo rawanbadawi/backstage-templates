@@ -140,6 +140,8 @@ jobs:
           service: ${{ vars.service_name }}
           region: ${{ vars.region }}
           metadata: container.yaml 
+  # IMPORTANT A Cloud Run product recommendation is that CI/CD systems not set or change settings for allowing unauthenticated invocations. 
+  # This was only added for demo purposes. Please do not use in your environments.
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v2'
         with:
@@ -149,4 +151,4 @@ jobs:
         run: |
           gcloud run services add-iam-policy-binding ${{ vars.service_name }} \
           --member="allUsers" \
-          --role="roles/run.invoker"'
+          --role="roles/run.invoker"
