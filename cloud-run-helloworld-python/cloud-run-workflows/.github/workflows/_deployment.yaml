@@ -12,8 +12,9 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: PyLint 
-      if: ${{ vars.language }} == 'python'
+    - name: PyLint
+      continue-on-error: true 
+      if: ${{ vars.language  == 'python' }}
       working-directory: ./
       run: |
         pip install -r requirements.txt
@@ -74,8 +75,8 @@ jobs:
         uses: 'google-github-actions/auth@v2'
         with:
           token_format: 'access_token'
-          workload_identity_provider: '${{ secrets.WIF_PROVIDER }}' # e.g. - projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider
-          service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'     # e.g. - my-service-account@my-project.iam.gserviceaccount.com
+          workload_identity_provider: '${{ secrets.wif_provider }}' # e.g. - projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider
+          service_account: '${{ secrets.wif_service_account }}'     # e.g. - my-service-account@my-project.iam.gserviceaccount.com
 
       # Authenticate Docker to Google Cloud Artifact Registry
       - name: Docker Authentication
@@ -84,7 +85,7 @@ jobs:
         with:
           username: 'oauth2accesstoken'
           password: '${{ steps.auth.outputs.access_token }}'
-          registry: '${{ vars.ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev'
+          registry: '${{ vars.artifact_registry_location }}-docker.pkg.dev'
 
       - name: Build and Tag
         id: build-image
@@ -93,14 +94,10 @@ jobs:
           context: ./
           push: true 
           tags: |
-            ${{ vars.ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.ARTIFACT_REGISTRY_REPO }}/${{ vars.service_name }}:${{ github.sha }}
-            ${{ vars.ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.ARTIFACT_REGISTRY_REPO }}/${{ vars.service_name }}:latest
+            ${{ vars.artifact_registry_location }}-docker.pkg.dev/${{ vars.project_id }}/${{ vars.artifact_registry_repo }}/${{ vars.service_name }}:${{ github.sha }}
+            ${{ vars.artifact_registry_location }}-docker.pkg.dev/${{ vars.project_id }}/${{ vars.artifact_registry_repo }}/${{ vars.service_name }}:latest
       
-      - name: Docker Push
-        shell: bash
-        run: |-
-          docker push "${{ vars.ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.ARTIFACT_REGISTRY_REPO }}/${{ vars.service_name }}:${{ github.sha }}"
-          docker push "${{ vars.ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.ARTIFACT_REGISTRY_REPO }}/${{ vars.service_name }}:latest"
+
 
   deploy: 
     if: github.event_name == 'push' 
@@ -119,14 +116,14 @@ jobs:
         uses: 'google-github-actions/auth@v2'
         with:
           token_format: 'access_token'
-          workload_identity_provider: '${{ secrets.WIF_PROVIDER }}' # e.g. - projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider
-          service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'     # e.g. - my-service-account@my-project.iam.gserviceaccount.com
+          workload_identity_provider: '${{ secrets.wif_provider }}' # e.g. - projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider
+          service_account: '${{ secrets.wif_service_account }}'     # e.g. - my-service-account@my-project.iam.gserviceaccount.com
 
       - name: Create Service Declaration   
         run: |-
-          export CONTAINER_IMAGE="${{ vars.ARTIFACT_REGISTRY_LOCATION  }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.artifact_registry_repo }}/${{ vars.service_name }}:${{ github.sha }}"
+          export CONTAINER_IMAGE="${{ vars.artifact_registry_location  }}-docker.pkg.dev/${{ vars.project_id }}/${{ vars.artifact_registry_repo }}/${{ vars.service_name }}:${{ github.sha }}"
           export SERVICE_NAME="${{ vars.service_name }}"
-          export PROJECT_ID="${{ vars.gcp_project_id }}"
+          export PROJECT_ID="${{ vars.project_id }}"
           export REVISION_TAG="${{ github.sha }}"
           export REGION="${{ vars.region }}"
       
@@ -136,7 +133,7 @@ jobs:
         id: deploy-cloud-run
         uses: google-github-actions/deploy-cloudrun@v2
         with:
-          project_id: ${{ vars.gcp_project_id }}
+          project_id: ${{ vars.project_id }}
           service: ${{ vars.service_name }}
           region: ${{ vars.region }}
           metadata: container.yaml 
@@ -150,6 +147,6 @@ jobs:
       - name: Add run invoker to public audience # please comment out if requires auth
         run: |
           gcloud run services add-iam-policy-binding ${{ vars.service_name }} \
-          --region=${{ vars.region }} --project=${{ vars.gcp_project_id }} \
+          --region=${{ vars.region }} --project=${{ vars.project_id }} \
           --member="allUsers" \
           --role="roles/run.invoker"
