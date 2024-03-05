@@ -308,7 +308,7 @@ spec:
           REGION: ${{ parameters.region }}
           ARTIFACT_REGISTRY_REPO: ${{ parameters.arRepo }}
           ARTIFACT_REGISTRY_LOCATION: ${{ parameters.arLocation }}
-          GCP_PROJECT_ID: ${{ parameters.gcpProjectId }}
+          PROJECT_ID: ${{ parameters.gcpProjectId }}
           WIF_PROVIDER: projects/${{ parameters.wifProjectNumber }}/locations/global/workloadIdentityPools/${{ parameters.wifPoolName}}/providers/${{ parameters.wifProviderName }}
           WIF_SERVICE_ACCOUNT: ${{ parameters.wifServiceAccount }}
         secrets:
