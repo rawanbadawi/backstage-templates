@@ -46,7 +46,7 @@ gcloud iam workload-identity-pools providers create-oidc "my-provider" \
   --workload-identity-pool="my-pool" \
   --display-name="Demo provider" \
   --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.aud=assertion.aud,attribute.repository=assertion.repository" \
-  --issuer-uri="https://token.actions.githubusercontent.com" \ 
+  --issuer-uri="https://token.actions.githubusercontent.com" 
 ```
 create service account used to deploy cloud run via Github Actions:
 
@@ -74,7 +74,9 @@ gcloud projects add-iam-policy-binding ${PROJECT_ID} --member="serviceAccount:${
 
 gcloud projects add-iam-policy-binding ${PROJECT_ID} --member="serviceAccount:${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com" --role=roles/iam.serviceAccountUser
 
-gcloud projects add-iam-policy-binding ${PROJECT_ID} --member="serviceAccount:${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com" --role=roles/run.admin
+gcloud projects add-iam-policy-binding ${PROJECT_ID} --member="serviceAccount:${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com" --role=roles/run.developer
+
+# WARNING DO NOT USE IN PROD Only for demo purposes. 
 
 gcloud projects add-iam-policy-binding ${PROJECT_ID} --member="serviceAccount:${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com" --roles/run.services.setIamPolicy
 ```
